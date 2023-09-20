@@ -1,0 +1,104 @@
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        char[][] grid = initializeGrid();
+        char currentPlayer = 'X';
+
+        printGrid(grid);
+
+        while (true) {
+            System.out.print("> ");
+            String moveInput = scanner.nextLine().trim();
+
+            if (!isValidInput(moveInput)) {
+                System.out.println("Invalid input. Please enter two integers separated by a space.");
+                continue;
+            }
+
+            int[] coordinates = parseCoordinates(moveInput);
+
+            if (!isValidMove(grid, coordinates)) {
+                System.out.println("Invalid move. Please choose an empty cell within the grid.");
+                continue;
+            }
+
+            grid[coordinates[0]][coordinates[1]] = currentPlayer;
+            printGrid(grid);
+
+            if (checkGameResult(grid, currentPlayer)) {
+                System.out.println(currentPlayer + " wins!");
+                break;
+            } else if (isGridFull(grid)) {
+                System.out.println("It's a draw!");
+                break;
+            }
+
+            // Switch to the other player
+            currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+        }
+    }
+
+    public static char[][] initializeGrid() {
+        return new char[][] {
+            {' ', ' ', ' '},
+            {' ', ' ', ' '},
+            {' ', ' ', ' '}
+        };
+    }
+
+    public static void printGrid(char[][] grid) {
+        System.out.println("---------");
+        for (int i = 0; i < 3; i++) {
+            System.out.print("| ");
+            for (int j = 0; j < 3; j++) {
+                System.out.print(grid[i][j] + " ");
+            }
+            System.out.println("|");
+        }
+        System.out.println("---------");
+    }
+
+    public static boolean isValidInput(String input) {
+        return input.matches("\\d+ \\d+");
+    }
+
+    public static int[] parseCoordinates(String input) {
+        String[] parts = input.split(" ");
+        int row = Integer.parseInt(parts[0]) - 1;
+        int col = Integer.parseInt(parts[1]) - 1;
+        return new int[]{row, col};
+    }
+
+    public static boolean isValidMove(char[][] grid, int[] coordinates) {
+        int row = coordinates[0];
+        int col = coordinates[1];
+        return row >= 0 && row < 3 && col >= 0 && col < 3 && grid[row][col] == ' ';
+    }
+
+    public static boolean checkGameResult(char[][] grid, char currentPlayer) {
+        // Check rows, columns, and diagonals for a win
+        for (int i = 0; i < 3; i++) {
+            if (grid[i][0] == currentPlayer && grid[i][1] == currentPlayer && grid[i][2] == currentPlayer
+                || grid[0][i] == currentPlayer && grid[1][i] == currentPlayer && grid[2][i] == currentPlayer) {
+                return true;
+            }
+        }
+
+        // Check diagonals
+        return (grid[0][0] == currentPlayer && grid[1][1] == currentPlayer && grid[2][2] == currentPlayer)
+            || (grid[0][2] == currentPlayer && grid[1][1] == currentPlayer && grid[2][0] == currentPlayer);
+    }
+
+    public static boolean isGridFull(char[][] grid) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (grid[i][j] == ' ') {
+                    return false; // Found an empty cell
+                }
+            }
+        }
+        return true; // Grid is full (draw)
+    }
+}
